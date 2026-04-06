@@ -6,14 +6,15 @@ int main()
 
     std::cout << "Write your expression, to exit, write esc\n";
     std::cout << "Write hear ----> ";
-    std::getline(std::cin, str);
+    std::getline(std::cin, str); // Читаем первое выражение
 
+    // Основной цикл: принимаем выражения до тех пор, пока пользователь не введёт "esc"
     while (str != "esc")
     {
-        //Сам алгоритм будет тут
+        // Переводим выражение в ОПН, затем вычисляем и выводим результат
         std::cout << FromPolsk(ToPolsk(str)) << "\n";
 
-        std::cout << "Write hear ----> ";   //Ввод нового выражения
-        std::getline(std::cin, str);
+        std::cout << "Write hear ----> ";
+        std::getline(std::cin, str); // Читаем следующее выражение
     }
 }
