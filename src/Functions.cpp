@@ -10,10 +10,10 @@ int IsNum(char ch)
 }
 
 // Возвращает 1, если строка является одним из операторов: + - * / ^
-int IsOp(std::string str)
+int IsOp(char str)
 {
-    if(((str == "+") || (str == "-") || (str == "*")
-            || (str == "/") || (str == "^"))) return 1;
+    if(((str == '+') || (str == '-') || (str == '*')
+            || (str == '/') || (str == '^'))) return 1;
 
     return 0;
 }
@@ -82,7 +82,8 @@ std::queue<std::string> ToPolsk(std::string str)
         }
 
         // Помещаем текущий символ в стек операторов
-        if ((i < str.length()) && (IsOp(str[i])))
+        if ((i < str.length()) && ((str[i] != '+') || (str[i] != '-') || (str[i] != '*')
+            || (str[i] != '/') || (str[i] != '^')))
         {
             std::string PreStr = "";
             PreStr += str[i];
@@ -112,7 +113,7 @@ double FromPolsk(std::queue<std::string> StAns)
     while(!StAns.empty())
     {
         // Если токен — число, кладём его в стек
-        if(!IsOp(StAns.front()))
+        if(!IsOp(StAns.front()[0]))
         {
             Ans.push(atof(StAns.front().c_str()));
             StAns.pop();
