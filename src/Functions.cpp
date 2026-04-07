@@ -20,7 +20,6 @@ int IsOp(char str)
 
 // Переводит инфиксное выражение (например "3+4*2") в обратную польскую нотацию.
 // Возвращает очередь токенов (чисел и операторов) в порядке ОПН.
-// TODO: реализовать алгоритм сортировочной станции.
 queue<string> ToPolsk(string str)
 {
     queue<string> Ans;   // Очередь результата (ОПН)
@@ -29,7 +28,8 @@ queue<string> ToPolsk(string str)
     bool BraFlag = 0;
     string Str1 = "";
 
-    str = DeleteSpase(str); // Убираем пробелы из входной строки
+    str = DeleteSpase(str);     // Убираем пробелы из входной строки
+    str = HandleNegative(str);  // Превращаем все -a в 0-a
 
     for (int i = 0; i < str.length(); i++)
     {
@@ -185,4 +185,16 @@ string DeleteLast(string str)
     }
 
     return S;
+}
+
+string HandleNegative(string str)
+{
+    if (str[0] == '-') str.insert(0, "0");
+
+    for (int i = 1; i < str.length(); i++)
+    {
+        if ((str[i] == '-') && (str[i - 1] == '(')) str.insert(i, "0");
+    }
+
+    return str;
 }

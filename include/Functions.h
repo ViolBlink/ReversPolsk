@@ -18,6 +18,7 @@ inline map<string, int> Prior = {{"+", 1}, {"-", 1}, {"*", 2}, {"/", 2}, {"^", 3
 queue<string> ToPolsk(string);
 double FromPolsk(queue<string>);
 string DeleteSpase(string);
+string HandleNegative(string);
 void QMerge(queue<string>*, queue<string>);
 
 int IsNum(char);
