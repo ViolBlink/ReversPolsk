@@ -1,22 +1,29 @@
 #include "../include/Functions.h"
+using std::queue;
+using std::string;
+using std::stack;
+using std::vector;
 
 
 // Возвращает 1, если символ является цифрой ('0'–'9'), иначе 0
-int IsNum(char ch)
+bool IsNum(char ch)
 {
-    if((ch >= '0') && (ch <= '9')) return 1;
+    if((ch >= '0') && (ch <= '9')) return true;
 
-    return 0;
+    return false;
 }
 
 // Возвращает 1, если строка является одним из операторов: + - * / ^
-int IsOp(char str)
+bool IsOp(char str)
 {
     if(((str == '+') || (str == '-') || (str == '*')
-            || (str == '/') || (str == '^'))) return 1;
+            || (str == '/') || (str == '^'))) return true;
 
-    return 0;
+    return false;
 }
+
+// Возвращает 1, если строка ни оператор ни символ, а значит, возможно, функция
+bool IsFun(char c) {    return (isalpha(c)); }
 
 // Переводит инфиксное выражение (например "3+4*2") в обратную польскую нотацию.
 // Возвращает очередь токенов (чисел и операторов) в порядке ОПН.
@@ -24,8 +31,7 @@ queue<string> ToPolsk(string str)
 {
     queue<string> Ans;   // Очередь результата (ОПН)
     stack<string> OpSt;  // Стек операторов
-    bool OpFlag = 0;               // Флаг: нужно ли вытолкнуть оператор из стека
-    bool BraFlag = 0;
+    // bool BraFlag = 0;
     string Str1 = "";
 
     str = DeleteSpase(str);     // Убираем пробелы из входной строки
@@ -33,6 +39,20 @@ queue<string> ToPolsk(string str)
 
     for (int i = 0; i < str.length(); i++)
     {
+        // Обработка начал функции
+        if(IsFun(str[i]))
+        {
+            string name = "";
+            // Прохожусь по имени пока не найду (
+            while ((i < str.length() - 1) && (str[i] != '('))
+            {
+                name += str[i];
+                i++;
+            }
+
+            OpSt.push(name);
+        }
+
         // Обработка открывающей скобки: рекурсивно обрабатываем содержимое
         if(str[i] == '(')
         {
@@ -117,37 +137,55 @@ double FromPolsk(queue<string> StAns)
 {
     stack<double> Ans; // Стек операндов
 
+
     while(!StAns.empty())
     {
+        string front = StAns.front();
         // Если токен — число, кладём его в стек
-        if(!IsOp(StAns.front()[0]))
+        if(IsNum(front[0]))
         {
-            Ans.push(atof(StAns.front().c_str()));
+            Ans.push(atof(front.c_str()));
             StAns.pop();
             continue;
         }
 
-        // Если токен — оператор, извлекаем два операнда и применяем операцию
-        double x1;
-        double x2;
+        // Число принимаемых аргументов
+        int number = Arity[front];
+        // Если токен — оператор, извлекаем нужное число операнда и применяем операцию
+        vector<double> operands(number);
 
-        x2 = Ans.top(); // Второй операнд (верхний)
-        Ans.pop();
+        for(int i = 0; i < number; i++)
+        {
+            operands[i] = Ans.top();
+            Ans.pop();
+        }
 
-        x1 = Ans.top(); // Первый операнд
-        Ans.pop();
-
-        if(StAns.front() == "+") Ans.push(x1 + x2);
-        if(StAns.front() == "-") Ans.push(x1 - x2);
-        if(StAns.front() == "*") Ans.push(x1 * x2);
-        if(StAns.front() == "/") Ans.push(x1 / x2);
-        if(StAns.front() == "^") Ans.push(pow(x1, x2));
+        if((front == "Cos")) Ans.push(cos(operands[0]));
+        if((front == "Sin")) Ans.push(sin(operands[0]));
+        if(front == "+") Ans.push(operands[0] + operands[1]);
+        if(front == "-") Ans.push(operands[1] - operands[0]);
+        if(front == "*") Ans.push(operands[0] * operands[1]);
+        if(front == "/") Ans.push(operands[1] / operands[0]);
+        if(front == "^") Ans.push(pow(operands[1], operands[0]));
 
         StAns.pop();
     }
 
     // Итоговый результат остаётся на вершине стека
     return Ans.top();
+}
+
+// Функция для вывод итоговой строки
+string ShowPolsk(queue<string> Q)
+{
+    string line = "[";
+    while(!Q.empty())
+    {
+        line += Q.front() + ",";
+        Q.pop();
+    }
+    line = DeleteLast(line) +"]";
+    return line;
 }
 
 // Удаляет все пробелы из строки
@@ -179,6 +217,8 @@ string DeleteLast(string str)
 {
     string S = "";
 
+    
+
     for(int i = 0; i < str.length() - 1; i++)
     {
         S += str[i];
@@ -197,4 +237,22 @@ string HandleNegative(string str)
     }
 
     return str;
+}
+
+vector<string> parce(string line)
+{
+    line = DeleteSpase(line);
+    vector<string> ans(2);
+    if(line.find("Show") != string::npos)
+    {
+        ans[0] = "Show";
+        ans[1] = line.substr(ans[0].length() + 1, line.length() - ans[0].length() - 2);
+    }
+    if(line.find("Calculate") != string::npos)
+    {
+        ans[0] = "Calculate";
+        ans[1] = line.substr(ans[0].length() + 1, line.length() - ans[0].length() - 2);
+    }
+
+    return ans;
 }

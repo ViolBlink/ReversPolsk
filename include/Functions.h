@@ -9,21 +9,28 @@
 #include <cmath>
 #include <map>
 
-using namespace std;
-
 // Словарь приориоритета операторов
 // inline - для избежания множественного определения при включении в несколько файлов
-inline map<string, int> Prior = {{"+", 1}, {"-", 1}, {"*", 2}, {"/", 2}, {"^", 3}};
+// Prior - приоритет каждой операции для работы сортировки
+inline std::map<std::string, int> Prior = {{"+", 1}, {"-", 1}, {"*", 2}, {"/", 2}, {"^", 3}, {"Sin", 4}, {"Cos", 4}};
+// Operations - какие команды поддерживает
+// TODO: Реализовать несколько
+inline std::map<std::string, int> Operations = {{"Calculate", 0}, {"Show", 1}};
+//Arity - кол-во принимаемых операторов
+inline std::map<std::string, int> Arity = {{"+", 2}, {"-", 2}, {"*", 2}, {"/", 2}, {"^", 2}, {"Sin", 1}, {"Cos", 1}};
 
-queue<string> ToPolsk(string);
-double FromPolsk(queue<string>);
-string DeleteSpase(string);
-string HandleNegative(string);
-void QMerge(queue<string>*, queue<string>);
+std::queue<std::string> ToPolsk(std::string);
+double FromPolsk(std::queue<std::string>);
+std::string ShowPolsk(std::queue<std::string>);
+std::string DeleteSpase(std::string);
+std::string HandleNegative(std::string);
+void QMerge(std::queue<std::string>*, std::queue<std::string>);
+std::vector<std::string> parce(std::string);
 
-int IsNum(char);
-int IsOp(char);
+bool IsNum(char);
+bool IsOp(char);
+bool IsFun(char);
 
-string DeleteLast(string);
+std::string DeleteLast(std::string);
 
-#endif //FUNCTIONS_H
+#endif //FUNCTIONS_H;
