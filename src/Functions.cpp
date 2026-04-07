@@ -44,13 +44,23 @@ queue<string> ToPolsk(string str)
         {
             string name = "";
             // Прохожусь по имени пока не найду (
-            while ((i < str.length() - 1) && (str[i] != '('))
+            while ((i < str.length()) && (str[i] != '(') && IsFun(str[i]))
             {
                 name += str[i];
                 i++;
             }
 
-            OpSt.push(name);
+            // Если переменная и она заданна, то загоняем ее значение в стек
+            if(Variables.count(name))
+            {
+                Ans.push(std::to_string(Variables[name]));
+            }
+            // Если это оператор, то загоняем его в стэк операторов
+            else if (Prior.count(name))
+            {
+                OpSt.push(name);
+            }
+            else{throw "This Variable is not defined";}
         }
 
         // Обработка открывающей скобки: рекурсивно обрабатываем содержимое
@@ -239,6 +249,12 @@ string HandleNegative(string str)
     return str;
 }
 
+// Задаем переменную
+void SetVar(vector<string> var)
+{
+    Variables[var[0]] = FromPolsk(ToPolsk(var[1]));
+}
+
 vector<string> parce(string line)
 {
     line = DeleteSpase(line);
@@ -252,6 +268,14 @@ vector<string> parce(string line)
     {
         ans[0] = "Calculate";
         ans[1] = line.substr(ans[0].length() + 1, line.length() - ans[0].length() - 2);
+    }
+    if(line.find("Set") != string::npos)
+    {
+        ans.insert(ans.begin(), "");
+        int pos = line.find(',');
+        ans[0] = "Set";
+        ans[1] = line.substr(4, pos - 4);
+        ans[2] = line.substr(pos + 1, line.length() - pos - 2);
     }
 
     return ans;
