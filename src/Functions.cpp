@@ -1,4 +1,4 @@
-#include "Functions.h"
+#include "../include/Functions.h"
 
 
 // Возвращает 1, если символ является цифрой ('0'–'9'), иначе 0
@@ -21,13 +21,13 @@ int IsOp(char str)
 // Переводит инфиксное выражение (например "3+4*2") в обратную польскую нотацию.
 // Возвращает очередь токенов (чисел и операторов) в порядке ОПН.
 // TODO: реализовать алгоритм сортировочной станции.
-std::queue<std::string> ToPolsk(std::string str)
+queue<string> ToPolsk(string str)
 {
-    std::queue<std::string> Ans;   // Очередь результата (ОПН)
-    std::stack<std::string> OpSt;  // Стек операторов
+    queue<string> Ans;   // Очередь результата (ОПН)
+    stack<string> OpSt;  // Стек операторов
     bool OpFlag = 0;               // Флаг: нужно ли вытолкнуть оператор из стека
     bool BraFlag = 0;
-    std::string Str1 = "";
+    string Str1 = "";
 
     str = DeleteSpase(str); // Убираем пробелы из входной строки
 
@@ -36,9 +36,9 @@ std::queue<std::string> ToPolsk(std::string str)
         // Обработка открывающей скобки: рекурсивно обрабатываем содержимое
         if(str[i] == '(')
         {
-            std::stack<char> st; // Вспомогательный стек для отслеживания вложенных скобок
+            stack<char> st; // Вспомогательный стек для отслеживания вложенных скобок
             st.push(str[i]);
-            std::string NewStr = "";
+            string NewStr = "";
 
             i++;
 
@@ -73,26 +73,32 @@ std::queue<std::string> ToPolsk(std::string str)
             Ans.push(Str1);
         }
 
-        // Если на предыдущей итерации был выставлен флаг — выталкиваем оператор в результат
-        if (OpFlag)
-        {
-            Ans.push(OpSt.top());
-            OpSt.pop();
-
-            OpFlag = 0;
-        }
 
         // Помещаем текущий символ в стек операторов
-        if ((i < str.length()) && ((str[i] != '+') || (str[i] != '-') || (str[i] != '*')
-            || (str[i] != '/') || (str[i] != '^')))
+        // Реализован алгоритм сортировочной станции
+        if (( i < str.length() ) && ( IsOp(str[i]) ))
         {
-            std::string PreStr = "";
+            string PreStr = "";
             PreStr += str[i];
+            if(PreStr == "^")
+            {
+                while( (!OpSt.empty()) && (Prior[OpSt.top()] > Prior[PreStr]))
+                {
+                    Ans.push(OpSt.top());
+                    OpSt.pop();
+                }
+            }
+            else
+            {
+                while((!OpSt.empty()) && (Prior[OpSt.top()] >= Prior[PreStr]))
+                {
+                    Ans.push(OpSt.top());
+                    OpSt.pop();
+                }
+            }
+
             OpSt.push(PreStr);
         }
-
-        // Для операторов высокого приоритета (* / ^) выставляем флаг выталкивания
-        if ((str[i] == '*') || (str[i] == '/') || (str[i] == '^') && !OpFlag) OpFlag = 1;
     }
 
     // Выталкиваем оставшиеся операторы из стека в результат
@@ -107,9 +113,9 @@ std::queue<std::string> ToPolsk(std::string str)
 
 // Вычисляет выражение, записанное в обратной польской нотации.
 // Возвращает результат вычисления как double.
-double FromPolsk(std::queue<std::string> StAns)
+double FromPolsk(queue<string> StAns)
 {
-    std::stack<double> Ans; // Стек операндов
+    stack<double> Ans; // Стек операндов
 
     while(!StAns.empty())
     {
@@ -145,9 +151,9 @@ double FromPolsk(std::queue<std::string> StAns)
 }
 
 // Удаляет все пробелы из строки
-std::string DeleteSpase(std::string str)
+string DeleteSpase(string str)
 {
-    std::string Ans = "";
+    string Ans = "";
 
     for(int i = 0; i < str.length(); i++)
     {
@@ -158,7 +164,7 @@ std::string DeleteSpase(std::string str)
 }
 
 // Добавляет все элементы очереди q2 в конец очереди q1
-void QMerge(std::queue<std::string> *q1, std::queue<std::string> q2)
+void QMerge(queue<string> *q1, queue<string> q2)
 {
     while(!q2.empty())
     {
@@ -169,9 +175,9 @@ void QMerge(std::queue<std::string> *q1, std::queue<std::string> q2)
 
 // Возвращает строку без последнего символа
 // Используется для удаления закрывающей ')' после извлечения содержимого скобок
-std::string DeleteLast(std::string str)
+string DeleteLast(string str)
 {
-    std::string S = "";
+    string S = "";
 
     for(int i = 0; i < str.length() - 1; i++)
     {
